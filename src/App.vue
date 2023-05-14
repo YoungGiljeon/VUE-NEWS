@@ -1,17 +1,45 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="app">   
+    <tool-bar></tool-bar>
+    <transition name="page">
+      <router-view></router-view>
+    </transition>    
+    <spinner :loading="loadingStatus"></spinner>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import ToolBar from './components/ToolBar.vue';
+import Spinner from './components/Spinner.vue';
+//import bus from './utils/bus/bus';
 
-export default {
-  name: 'App',
+ export default {
   components: {
-    HelloWorld
+    ToolBar,
+    Spinner,
+  },
+  data() {
+    return {
+      loadingStatus: false,
+    };
+  },
+  methods: {
+    startSpinner() {
+      this.loadingStatus = true;
+    },
+    endSpinner() {
+      this.loadingStatus = false;
+    }
+  },
+  created() {
+    this.emitter.on('start:spinner', this.startSpinner);
+    this.emitter.on('end:spinner', this.endSpinner);
+  },
+  beforeUnmount() {
+    this.emitter.off('start:spinner', this.startSpinner);
+    this.emitter.off('end:spinner', this.endSpinner);
   }
-}
+ }
 </script>
 
 <style>
@@ -22,5 +50,32 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+},
+
+body {
+  padding: 0;
+  margin: 0;
+}
+a {
+  color: #34495e;
+  text-decoration: 0;
+}
+a:hover {
+  color:  #42b883;
+  text-decoration: underline;
+}
+a.router-link-exact-active {
+  text-decoration: underline;
+}
+
+/* 라우터 트랜지션 */
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
 }
 </style>
